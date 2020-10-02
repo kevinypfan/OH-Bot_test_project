@@ -20,6 +20,11 @@ export class Token extends Entity {
   refresh_token?: string;
 
   @property({
+    type: 'string',
+  })
+  auth_token?: string;
+
+  @property({
     type: 'date',
   })
   expires?: string;
@@ -28,6 +33,12 @@ export class Token extends Entity {
     type: 'string',
   })
   id_user?: string;
+
+  @property({
+    type: 'boolean',
+    default: false,
+  })
+  revoked?: boolean;
 
   constructor(data?: Partial<Token>) {
     super(data);

@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import {ApplicationConfig, BackendApplication} from './application';
 
 export * from './application';
