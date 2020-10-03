@@ -75,7 +75,7 @@ export class AuthController {
       new Date().valueOf() + result.data.expires_in,
     ).toISOString();
     tokenBeSave.id_user = user.id_user;
-    tokenBeSave.auth_token = await generateRandomToken();
+    tokenBeSave.auth_token = user.id_user + (await generateRandomToken());
     const token = await this.tokenRepository.create(tokenBeSave);
 
     response.redirect(
