@@ -18,8 +18,11 @@ const PUBLIC_END_POINTS = [
 ];
 const USER_END_POINTS = [
   {path: '/users', methods: 'GET,POST'},
+  {path: '/stores', methods: 'POST'},
+  {path: '/stores/{?}', methods: 'PATCH'},
   {path: '/profile', methods: 'GET'},
   {path: '/logout', methods: 'DELETE'},
+  {path: '/stores/{?}', methods: 'DELETE'},
 ];
 
 /**

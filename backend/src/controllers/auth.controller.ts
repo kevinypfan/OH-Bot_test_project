@@ -72,7 +72,7 @@ export class AuthController {
     tokenBeSave.access_token = result.data.access_token;
     tokenBeSave.refresh_token = result.data.refresh_token;
     tokenBeSave.expires = new Date(
-      new Date().valueOf() + result.data.expires_in,
+      new Date().valueOf() + result.data.expires_in * 1000,
     ).toISOString();
     tokenBeSave.id_user = user.id_user;
     tokenBeSave.auth_token = user.id_user + (await generateRandomToken());

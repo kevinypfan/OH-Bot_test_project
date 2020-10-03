@@ -1,3 +1,4 @@
+import {inject} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -7,14 +8,16 @@ import {
   Where,
 } from '@loopback/repository';
 import {
-  post,
-  param,
+  del,
   get,
   getModelSchemaRef,
+  HttpErrors,
+  param,
   patch,
+  post,
   put,
-  del,
   requestBody,
+  RestBindings,
 } from '@loopback/rest';
 import {Store} from '../models';
 import {StoreRepository} from '../repositories';
@@ -22,7 +25,7 @@ import {StoreRepository} from '../repositories';
 export class StoreController {
   constructor(
     @repository(StoreRepository)
-    public storeRepository : StoreRepository,
+    public storeRepository: StoreRepository,
   ) {}
 
   @post('/stores', {
@@ -34,6 +37,7 @@ export class StoreController {
     },
   })
   async create(
+    @inject(RestBindings.Http.REQUEST) request: any,
     @requestBody({
       content: {
         'application/json': {
@@ -46,6 +50,7 @@ export class StoreController {
     })
     store: Omit<Store, 'id_store'>,
   ): Promise<Store> {
+    store.id_user = request.user.id_user;
     return this.storeRepository.create(store);
   }
 
@@ -57,9 +62,7 @@ export class StoreController {
       },
     },
   })
-  async count(
-    @param.where(Store) where?: Where<Store>,
-  ): Promise<Count> {
+  async count(@param.where(Store) where?: Where<Store>): Promise<Count> {
     return this.storeRepository.count(where);
   }
 
@@ -78,9 +81,7 @@ export class StoreController {
       },
     },
   })
-  async find(
-    @param.filter(Store) filter?: Filter<Store>,
-  ): Promise<Store[]> {
+  async find(@param.filter(Store) filter?: Filter<Store>): Promise<Store[]> {
     return this.storeRepository.find(filter);
   }
 
@@ -120,7 +121,8 @@ export class StoreController {
   })
   async findById(
     @param.path.string('id') id: string,
-    @param.filter(Store, {exclude: 'where'}) filter?: FilterExcludingWhere<Store>
+    @param.filter(Store, {exclude: 'where'})
+    filter?: FilterExcludingWhere<Store>,
   ): Promise<Store> {
     return this.storeRepository.findById(id, filter);
   }
@@ -133,6 +135,7 @@ export class StoreController {
     },
   })
   async updateById(
+    @inject(RestBindings.Http.REQUEST) request: any,
     @param.path.string('id') id: string,
     @requestBody({
       content: {
@@ -143,6 +146,10 @@ export class StoreController {
     })
     store: Store,
   ): Promise<void> {
+    const oldStore = await this.storeRepository.findById(id);
+    if (oldStore.id_user.toString() !== request.user.id_user.toString()) {
+      throw new HttpErrors[403]('Your are not the creator');
+    }
     await this.storeRepository.updateById(id, store);
   }
 
@@ -167,7 +174,14 @@ export class StoreController {
       },
     },
   })
-  async deleteById(@param.path.string('id') id: string): Promise<void> {
+  async deleteById(
+    @inject(RestBindings.Http.REQUEST) request: any,
+    @param.path.string('id') id: string,
+  ): Promise<void> {
+    const store = await this.storeRepository.findById(id);
+    if (store.id_user.toString() !== request.user.id_user.toString()) {
+      throw new HttpErrors[403]('Your are not the creator');
+    }
     await this.storeRepository.deleteById(id);
   }
 }
