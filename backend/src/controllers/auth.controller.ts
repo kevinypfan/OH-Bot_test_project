@@ -2,7 +2,7 @@
 
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {get, param, Response, RestBindings} from '@loopback/rest';
+import {del, get, param, Response, RestBindings} from '@loopback/rest';
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import {Token, User} from '../models';
@@ -80,12 +80,26 @@ export class AuthController {
 
     response.redirect(
       301,
-      `${process.env.FRONTEND_URL}/process-login?token=${token.auth_token}`,
+      `${process.env.FRONTEND_URL}/process-login?token=${token.auth_token}&state=${state}`,
     );
   }
 
-  // @get('/profile')
-  // async profile(): Promise<PROFILE> {
-  //   return;
-  // }
+  @get('/profile')
+  async profile(
+    @inject(RestBindings.Http.REQUEST) request: any,
+  ): Promise<PROFILE> {
+    return {
+      name: request.user.name,
+      email: request.user.email,
+      picture: request.user.picture,
+    };
+  }
+
+  @del('/logout')
+  async logout(@inject(RestBindings.Http.REQUEST) request: any): Promise<void> {
+    console.log(request.token);
+    const token = await this.tokenRepository.findById(request.token.id_token);
+    token.revoked = true;
+    this.tokenRepository.update(token);
+  }
 }

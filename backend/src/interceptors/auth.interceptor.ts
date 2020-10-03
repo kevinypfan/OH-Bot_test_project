@@ -16,7 +16,11 @@ const PUBLIC_END_POINTS = [
   {path: '/auth', methods: 'GET'},
   // {path: '/stores/{?}', methods: 'GET'},
 ];
-const USER_END_POINTS = [{path: '/users', methods: 'GET,POST'}];
+const USER_END_POINTS = [
+  {path: '/users', methods: 'GET,POST'},
+  {path: '/profile', methods: 'GET'},
+  {path: '/logout', methods: 'DELETE'},
+];
 
 /**
  * This class will be bound to the application as an `Interceptor` during
@@ -55,15 +59,13 @@ export class AuthInterceptor implements Provider<Interceptor> {
       });
 
       if (req) {
-        let authorized = false;
-
         const matchUserEndPointIndex = USER_END_POINTS.findIndex(endPoint => {
           // return (
           //   endPoint.path === req.url &&
           //   endPoint.methods.indexOf(req.method.toUpperCase()) > -1
           // );
           if (endPoint.methods.indexOf(req.method.toUpperCase()) > -1) {
-            const checkPath = req.url.split('/');
+            const checkPath = req.path.split('/');
             const testPath = endPoint.path.split('/');
             if (checkPath.length === testPath.length) {
               const match = testPath.map((path, index) => {
@@ -104,7 +106,7 @@ export class AuthInterceptor implements Provider<Interceptor> {
             //   endPoint.methods.indexOf(req.method.toUpperCase()) > -1
             // );
             if (endPoint.methods.indexOf(req.method.toUpperCase()) > -1) {
-              const checkPath = req.url.split('/');
+              const checkPath = req.path.split('/');
               const testPath = endPoint.path.split('/');
               if (checkPath.length === testPath.length) {
                 const match = testPath.map((path, index) => {
