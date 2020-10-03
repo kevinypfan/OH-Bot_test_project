@@ -14,4 +14,9 @@ export default new Vuex.Store({
   },
   actions: {},
   modules: {},
+  getters: {
+    isAuth(state) {
+      return !!state.user;
+    },
+  },
 });

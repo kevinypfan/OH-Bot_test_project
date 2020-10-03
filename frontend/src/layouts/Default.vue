@@ -62,9 +62,7 @@
       <v-container>
         <router-view />
       </v-container>
-      <v-btn class="mx-2" fab dark color="indigo" fixed right bottom>
-        <v-icon dark>mdi-plus</v-icon>
-      </v-btn>
+      
     </v-main>
   </div>
 </template>
@@ -87,6 +85,7 @@ export default {
         .then((result) => {
           window.localStorage.clear();
           console.log("logout ok: ", result);
+          this.$store.commit("setUser", null);
           this.$router.replace("/");
         })
         .catch((err) => {

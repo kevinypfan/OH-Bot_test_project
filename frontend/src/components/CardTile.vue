@@ -1,34 +1,31 @@
 <template>
   <v-card class="mx-auto" dark>
     <v-card-title>
-      <v-icon large left>
-        mdi-office-building-outline
-      </v-icon>
-      <span class="title font-weight-light">Twitter</span>
+      <v-icon large left> mdi-office-building-outline </v-icon>
+      <span class="title font-weight-light">{{ store.name }}</span>
       <v-spacer></v-spacer>
-      <v-menu offset-y>
+      <v-menu offset-y v-if="$store.getters.isAuth">
         <template v-slot:activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </template>
         <v-list>
-          <v-list-item
-            v-for="(item, index) in items"
-            :key="index"
-            @click="btnClick"
-          >
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
+          <v-list-item @click="editStore(store.id_store, store)">
+            <v-list-item-title> 修改 </v-list-item-title>
+          </v-list-item>
+          <v-list-item @click="deleteStore(store.id_store, store)">
+            <v-list-item-title> 刪除 </v-list-item-title>
           </v-list-item>
         </v-list>
       </v-menu>
     </v-card-title>
 
     <v-card-text>
-      <div>
-        <p class="text-body-1">店家地址：</p>
-        <p class="text-body-1">店家電話：</p>
-        <p class="text-body-1">店家負責人：</p>
+      <div class="text-subtitle-1">
+        <p>店家地址： {{ store.address }}</p>
+        <p>店家電話： {{ store.phone }}</p>
+        <p>店家負責人： {{ store.principal }}</p>
       </div>
       <!-- "Turns out semicolon-less style is easier and safer in TS because most
       gotcha edge cases are type invalid as well." -->
@@ -37,14 +34,11 @@
     <v-card-actions>
       <v-list-item class="grow">
         <v-list-item-avatar color="grey darken-3">
-          <v-img
-            class="elevation-6"
-            src="https://avataaars.io/?avatarStyle=Transparent&topType=ShortHairShortCurly&accessoriesType=Prescription02&hairColor=Black&facialHairType=Blank&clotheType=Hoodie&clotheColor=White&eyeType=Default&eyebrowType=DefaultNatural&mouthType=Default&skinColor=Light"
-          ></v-img>
+          <v-img class="elevation-6" :src="store.user.picture"></v-img>
         </v-list-item-avatar>
 
         <v-list-item-content>
-          <v-list-item-title>Evan You</v-list-item-title>
+          <v-list-item-title>{{ store.user.name }}</v-list-item-title>
         </v-list-item-content>
 
         <!-- <v-row align="center" justify="end">
@@ -60,9 +54,12 @@
 </template>
 <script>
 export default {
-  data: () => ({
-    items: [{ title: "修改" }, { title: "刪除" }],
-  }),
+  props: {
+    store: Object,
+    editStore: Function,
+    deleteStore: Function,
+  },
+  data: () => ({}),
   methods: {
     btnClick() {
       console.log("hello");

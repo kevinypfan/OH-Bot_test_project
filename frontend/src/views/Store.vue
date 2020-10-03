@@ -1,15 +1,220 @@
 <template>
   <div class="store">
-    <template v-for="i in 10">
-      <div class="card my-1" :key="i">
-        <CardTile />
-      </div>
-    </template>
+    <v-row>
+      <v-col cols="9"
+        ><v-text-field
+          label="Regular"
+          outlined
+          solo
+          rounded
+          dense
+          prepend-inner-icon="mdi-magnify"
+        ></v-text-field>
+      </v-col>
+      <v-col cols="3">
+        <v-btn-toggle v-model="toggle_exclusive">
+          <v-btn>
+            <v-icon>mdi-format-align-left</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon>mdi-format-align-center</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon>mdi-format-align-right</v-icon>
+          </v-btn>
+
+          <v-btn>
+            <v-icon>mdi-format-align-justify</v-icon>
+          </v-btn>
+        </v-btn-toggle>
+      </v-col>
+    </v-row>
+    <div class="store-list" v-if="stores">
+      <template v-for="item in stores">
+        <div class="card my-1" :key="item.id_store">
+          <CardTile
+            :store="item"
+            :editStore="editDiglogHandler"
+            :deleteStore="deleteDiglogHandler"
+          />
+        </div>
+      </template>
+    </div>
+    <v-btn
+      class="mx-2"
+      fab
+      dark
+      color="indigo"
+      fixed
+      right
+      bottom
+      v-if="$store.getters.isAuth"
+      @click="openNewStoreDialogHandler"
+    >
+      <v-icon dark>mdi-plus</v-icon>
+    </v-btn>
+    <EditStore
+      :dialog="editDialog"
+      :closeDialog="closeDialogHandler"
+      :store="selectedStoreForm"
+      :mode="dialogMode"
+      :submitDialog="submitDialogHandler"
+    />
+    <v-dialog v-model="deleteConfirmDialog" persistent max-width="500">
+      <v-card>
+        <v-card-title class="headline"> 刪除確認 </v-card-title>
+        <v-card-text>
+          <p>請確定是否要刪除店家名稱：{{ selectedStoreForm.name }}。</p>
+          <p>注意刪除後將無法復原。</p>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="green darken-1"
+            text
+            @click="deleteConfirmDialog = false"
+          >
+            取消</v-btn
+          >
+          <v-btn color="green darken-1" text @click="deleteDialogHandler">
+            刪除</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-snackbar v-model="snackbar" :color="snackbarColor">
+      {{ snackbarText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn text v-bind="attrs" @click="snackbar = false"> Close </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 <script>
 import CardTile from "../components/CardTile";
+import EditStore from "../components/EditStore";
+
+const storeInitForm = {
+  name: "",
+  address: "",
+  phone: "",
+  principal: "",
+};
+
 export default {
-  components: { CardTile },
+  data() {
+    return {
+      snackbar: false,
+      snackbarColor: "error",
+      snackbarText: "Something wrong",
+      toggle_exclusive: null,
+      searchInput: "",
+      editDialog: false,
+      dialogMode: null,
+      selectedStoreId: null,
+      selectedStoreForm: storeInitForm,
+      stores: null,
+      deleteConfirmDialog: false,
+    };
+  },
+  components: { CardTile, EditStore },
+  mounted() {
+    this.loadStores();
+  },
+  methods: {
+    async loadStores() {
+      try {
+        const { data } = await this.$axios.get(
+          '/api/stores?filter={"include": [{"relation": "user"}],"order":["id_store DESC"]}'
+        );
+        this.stores = data;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    openNewStoreDialogHandler() {
+      this.editDialog = true;
+      this.dialogMode = "NEW";
+    },
+    editDiglogHandler(storeId, store) {
+      console.log({ storeId, store });
+      this.selectedStoreId = storeId;
+      this.selectedStoreForm.name = store.name;
+      this.selectedStoreForm.address = store.address;
+      this.selectedStoreForm.phone = store.phone;
+      this.selectedStoreForm.principal = store.principal;
+      this.dialogMode = "EDIT";
+      this.editDialog = true;
+    },
+    deleteDiglogHandler(storeId, store) {
+      this.selectedStoreId = storeId;
+      this.selectedStoreForm.name = store.name;
+      this.selectedStoreForm.address = store.address;
+      this.selectedStoreForm.phone = store.phone;
+      this.selectedStoreForm.principal = store.principal;
+      this.deleteConfirmDialog = true;
+    },
+    async deleteDialogHandler() {
+      try {
+        await this.$axios.delete("/api/stores/" + this.selectedStoreId, {
+          headers: { auth_token: window.localStorage.getItem("auth_token") },
+        });
+        this.snackbar = true;
+        this.snackbarColor = "success";
+        this.snackbarText = "已成功刪除";
+        this.deleteConfirmDialog = false;
+      } catch (error) {
+        this.snackbar = true;
+        this.snackbarColor = "error";
+        this.snackbarText = error.response.data.error.message;
+      }
+    },
+    async submitDialogHandler(mode, payload) {
+      if (mode === "NEW") {
+        try {
+          await this.$axios.post("/api/stores", payload, {
+            headers: { auth_token: window.localStorage.getItem("auth_token") },
+          });
+          this.snackbar = true;
+          this.snackbarColor = "success";
+          this.snackbarText = "已成功新增";
+          this.closeDialogHandler();
+        } catch (error) {
+          this.snackbar = true;
+          this.snackbarColor = "error";
+          this.snackbarText = error.response.data.error.message;
+        }
+      } else if (mode === "EDIT") {
+        try {
+          await this.$axios.patch(
+            "/api/stores/" + this.selectedStoreId,
+            payload,
+            {
+              headers: {
+                auth_token: window.localStorage.getItem("auth_token"),
+              },
+            }
+          );
+          this.snackbar = true;
+          this.snackbarColor = "success";
+          this.snackbarText = "已成功編輯";
+          this.closeDialogHandler();
+        } catch (error) {
+          this.snackbar = true;
+          this.snackbarColor = "error";
+          this.snackbarText = error.response.data.error.message;
+        }
+      } else {
+        console.log("no support");
+      }
+    },
+    closeDialogHandler() {
+      this.editDialog = false;
+      this.selectedStoreForm = storeInitForm;
+    },
+  },
 };
 </script>
