@@ -23,10 +23,40 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn text @click="loginHandler">
+      <v-btn text @click="loginHandler" v-if="!$store.state.user">
         <span>登入</span>
-        <!-- <v-icon>mdi-open-in-new</v-icon> -->
       </v-btn>
+
+      <v-menu open-on-hover offset-y v-else>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn text v-bind="attrs" v-on="on">
+            <v-avatar size="36">
+              <img
+                :src="$store.state.user.picture"
+                :alt="$store.state.user.name"
+              />
+            </v-avatar>
+            <span class="ml-3 font-weight-bold text-body-1"
+              >Hi! {{ $store.state.user.name }}</span
+            >
+          </v-btn>
+        </template>
+
+        <v-list>
+          <v-list-item @click="logoutHandler">
+            <v-list-item-title>Logout</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+
+      <!-- <div class="profile-block" v-else>
+        <v-avatar size="36">
+          <img :src="$store.state.user.picture" :alt="$store.state.user.name" />
+        </v-avatar>
+        <span class="mx-3 font-weight-bold text-body-1"
+          >Hi! {{ $store.state.user.name }}</span
+        >
+      </div> -->
     </v-app-bar>
     <v-main>
       <v-container>
@@ -47,6 +77,21 @@ export default {
     loginHandler() {
       console.log("login btn clicked");
       window.location.href = process.env.VUE_APP_LINE_LOGIN_URI;
+    },
+    logoutHandler() {
+      console.log("logout btn clicked");
+      this.$axios
+        .delete("/api/logout", {
+          headers: { auth_token: window.localStorage.getItem("auth_token") },
+        })
+        .then((result) => {
+          window.localStorage.clear();
+          console.log("logout ok: ", result);
+          this.$router.replace("/");
+        })
+        .catch((err) => {
+          console.log("logout error: ", err);
+        });
     },
   },
 };
