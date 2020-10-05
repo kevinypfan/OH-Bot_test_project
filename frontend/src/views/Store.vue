@@ -192,6 +192,7 @@ export default {
           this.snackbar = true;
           this.snackbarColor = "error";
           this.snackbarText = error.response.data.error.message;
+          this.closeDialogHandler();
         }
       } else if (mode === "EDIT") {
         try {
@@ -213,6 +214,7 @@ export default {
           this.snackbar = true;
           this.snackbarColor = "error";
           this.snackbarText = error.response.data.error.message;
+          this.closeDialogHandler();
         }
       } else {
         console.log("no support");
