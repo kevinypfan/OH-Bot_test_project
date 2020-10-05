@@ -1,7 +1,7 @@
 <template>
   <div class="store">
     <v-row align-content="center" justify="center">
-      <v-col md="9" xs="12" sm="12" lg="9" xl="9" justify="center">
+      <v-col cols="12" md="9" justify="center">
         <v-text-field
           label="店家名稱關鍵字搜尋"
           outlined
@@ -13,15 +13,7 @@
         >
         </v-text-field>
       </v-col>
-      <v-col
-        md="3"
-        xs="12"
-        sm="12"
-        lg="9"
-        xl="9"
-        justify="center"
-        v-if="$store.getters.isAuth"
-      >
+      <v-col cols="6" md="3" justify="center" v-if="$store.getters.isAuth">
         <v-btn-toggle v-model="toggleExclusive">
           <v-btn> 顯示全部店家 </v-btn>
 
