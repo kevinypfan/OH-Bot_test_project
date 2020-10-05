@@ -25,7 +25,7 @@
       <template v-if="!$store.state.user">
         <v-btn
           text
-          @click="loginHandler"
+          @click="loginHandler(value)"
           v-for="(value, key) in oauthUrls"
           :key="key"
         >
@@ -87,8 +87,8 @@ export default {
       const { data } = await this.$axios.get("/api/oauth-urls");
       this.oauthUrls = data;
     },
-    loginHandler() {
-      window.location.href = process.env.VUE_APP_LINE_LOGIN_URI;
+    loginHandler(value) {
+      window.location.href = value;
     },
     logoutHandler() {
       this.$axios
