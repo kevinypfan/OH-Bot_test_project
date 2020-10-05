@@ -89,12 +89,12 @@
 import CardTile from "../components/CardTile";
 import EditStore from "../components/EditStore";
 
-const storeInitForm = {
+const storeInitForm = Object.freeze({
   name: "",
   address: "",
   phone: "",
   principal: "",
-};
+});
 
 export default {
   data() {
@@ -107,7 +107,7 @@ export default {
       editDialog: false,
       dialogMode: null,
       selectedStoreId: null,
-      selectedStoreForm: storeInitForm,
+      selectedStoreForm: { ...storeInitForm },
       stores: null,
       deleteConfirmDialog: false,
       searchTerm: "",
@@ -222,7 +222,7 @@ export default {
     },
     closeDialogHandler() {
       this.editDialog = false;
-      this.selectedStoreForm = storeInitForm;
+      this.selectedStoreForm = { ...storeInitForm };
     },
   },
   watch: {
