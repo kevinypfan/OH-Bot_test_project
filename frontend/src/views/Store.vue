@@ -76,7 +76,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="snackbar" :color="snackbarColor" right top>
+    <v-snackbar v-model="snackbar" :color="snackbarColor" top>
       {{ snackbarText }}
 
       <template v-slot:action="{ attrs }">
