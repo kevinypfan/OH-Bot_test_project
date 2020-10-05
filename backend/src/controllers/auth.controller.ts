@@ -32,7 +32,7 @@ export class AuthController {
     data.append('client_id', process.env.LINE_CLIENT_ID!);
     data.append('redirect_uri', process.env.LINE_REDIRECT_URI!);
     data.append('state', '12345abcde');
-    data.append('scope', 'openid%20profile%20email');
+    data.append('scope', 'openid profile email');
     data.append('nonce', '09876xyz');
 
     return {
