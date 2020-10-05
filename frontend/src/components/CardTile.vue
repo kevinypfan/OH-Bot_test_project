@@ -25,8 +25,9 @@
       <div class="text-subtitle-1">
         <p>
           店家地址：
-          <a :href="'https://maps.google.com/maps?q=' + store.address"></a>
-          {{ store.address }}
+          <a :href="'https://maps.google.com/maps?q=' + store.address">
+            {{ store.address }}
+          </a>
         </p>
         <p>
           店家電話： <a :href="'tel:' + store.phone">{{ store.phone }}</a>
