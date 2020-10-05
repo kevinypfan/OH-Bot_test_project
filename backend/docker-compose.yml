@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  db:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - /srv/mongo/data/db:/data/db
+  web:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+    environment:
+      LINE_CLIENT_ID: example
+      LINE_CLIENT_SECRET: example
+      LINE_REDIRECT_URI: http://localhost:8080/auth
+      FRONTEND_URL: http://localhost:8080
+      MONGO_URI: mongodb://root:example@db:27017/work_demo?authSource=admin
+      MONGO_HOST: db
+      MONGO_PORT: 27017
+      MONGO_DATABASE: work_demo
+      MONGO_USER: root
+      MONGO_PASSWORD: example
+    tty: true
+    stdin_open: true

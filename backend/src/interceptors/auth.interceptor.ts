@@ -14,6 +14,7 @@ import {TokenRepository, UserRepository} from '../repositories/index';
 const PUBLIC_END_POINTS = [
   {path: '/stores', methods: 'GET'},
   {path: '/auth', methods: 'GET'},
+  {path: '/oauth-urls', methods: 'GET'},
   // {path: '/stores/{?}', methods: 'GET'},
 ];
 const USER_END_POINTS = [

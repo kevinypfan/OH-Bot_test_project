@@ -10,6 +10,7 @@ import {TokenRepository, UserRepository} from '../repositories';
 import {generateRandomToken} from '../utils/genToken';
 
 interface PROFILE {
+  id_user: string;
   name: string;
   picture: string;
   email: string;
@@ -23,13 +24,29 @@ export class AuthController {
     public userRepository: UserRepository,
   ) {}
 
+  @get('/oauth-urls')
+  async oauthUrls(): Promise<object> {
+    const baseLineOauthUrl = 'https://access.line.me/oauth2/v2.1/authorize';
+    const data = new URLSearchParams();
+    data.append('response_type', 'code');
+    data.append('client_id', process.env.LINE_CLIENT_ID!);
+    data.append('redirect_uri', process.env.LINE_REDIRECT_URI!);
+    data.append('state', '12345abcde');
+    data.append('scope', 'openid%20profile%20email');
+    data.append('nonce', '09876xyz');
+
+    return {
+      line: baseLineOauthUrl + data.toString(),
+    };
+  }
+
   @get('/auth')
   async auth(
     @param.query.string('code') code: string,
     @param.query.string('state') state: string,
     @inject(RestBindings.Http.RESPONSE) response: Response,
   ): Promise<void> {
-    var data = new URLSearchParams();
+    const data = new URLSearchParams();
     // LINE_CLIENT_ID
     // LINE_CLIENT_SECRET
     // LINE_REDIRECT_URI
@@ -89,6 +106,7 @@ export class AuthController {
     @inject(RestBindings.Http.REQUEST) request: any,
   ): Promise<PROFILE> {
     return {
+      id_user: request.user.id_user.toString(),
       name: request.user.name,
       email: request.user.email,
       picture: request.user.picture,
