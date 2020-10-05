@@ -1,9 +1,8 @@
 <template>
-  <v-progress-circular
-    :size="50"
-    color="primary"
-    indeterminate
-  ></v-progress-circular>
+  <div class="text-center mt-5">
+    <v-progress-circular :size="50" color="primary" indeterminate>
+    </v-progress-circular>
+  </div>
 </template>
 <script>
 export default {
