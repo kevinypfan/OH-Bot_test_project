@@ -1,7 +1,7 @@
 <template>
   <div class="store">
     <v-row align-content="center" justify="center">
-      <v-col cols="9" md="9" xs="12" sm="12" lg="9" xl="9" justify="center">
+      <v-col md="9" xs="12" sm="12" lg="9" xl="9" justify="center">
         <v-text-field
           label="店家名稱關鍵字搜尋"
           outlined
@@ -14,7 +14,6 @@
         </v-text-field>
       </v-col>
       <v-col
-        cols="3"
         md="3"
         xs="12"
         sm="12"
