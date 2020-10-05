@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 services:
   db:
     image: mongo
@@ -18,12 +18,12 @@ services:
       - ./:/app
       - /app/node_modules
     ports:
-      - '3000:3000'
+      - '3100:3100'
     depends_on:
       - db
     environment:
       TZ: UTC
-      PORT: 3000
+      PORT: 3100
       LINE_CLIENT_ID: example
       LINE_CLIENT_SECRET: example
       LINE_REDIRECT_URI: http://localhost:8080/auth
