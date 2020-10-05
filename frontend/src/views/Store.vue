@@ -14,11 +14,13 @@
         </v-text-field>
       </v-col>
       <v-col cols="12" md="3" v-if="$store.getters.isAuth">
-        <v-btn-toggle v-model="toggleExclusive">
-          <v-btn> 顯示全部店家 </v-btn>
+        <v-row justify="center">
+          <v-btn-toggle v-model="toggleExclusive">
+            <v-btn> 顯示全部店家 </v-btn>
 
-          <v-btn> 屬於我的店家 </v-btn>
-        </v-btn-toggle>
+            <v-btn> 屬於我的店家 </v-btn>
+          </v-btn-toggle>
+        </v-row>
       </v-col>
     </v-row>
     <div class="store-list" v-if="filterStoreByTerm">
