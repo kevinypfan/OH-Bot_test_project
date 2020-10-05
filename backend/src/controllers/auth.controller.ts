@@ -36,7 +36,7 @@ export class AuthController {
     data.append('nonce', '09876xyz');
 
     return {
-      line: baseLineOauthUrl + data.toString(),
+      line: `${baseLineOauthUrl}?${data.toString()}`,
     };
   }
 
