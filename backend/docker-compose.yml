@@ -22,6 +22,8 @@ services:
     depends_on:
       - db
     environment:
+      TZ: UTC
+      PORT: 3000
       LINE_CLIENT_ID: example
       LINE_CLIENT_SECRET: example
       LINE_REDIRECT_URI: http://localhost:8080/auth
