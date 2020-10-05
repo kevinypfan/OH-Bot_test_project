@@ -23,8 +23,14 @@
 
     <v-card-text>
       <div class="text-subtitle-1">
-        <p>店家地址： {{ store.address }}</p>
-        <p>店家電話： {{ store.phone }}</p>
+        <p>
+          店家地址：
+          <a :href="'https://maps.google.com/maps?q=' + store.address"></a>
+          {{ store.address }}
+        </p>
+        <p>
+          店家電話： <a :href="'tel:' + store.phone">{{ store.phone }}</a>
+        </p>
         <p>店家負責人： {{ store.principal }}</p>
       </div>
       <!-- "Turns out semicolon-less style is easier and safer in TS because most
