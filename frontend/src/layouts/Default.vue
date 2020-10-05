@@ -22,10 +22,16 @@
       </div>
 
       <v-spacer></v-spacer>
-
-      <v-btn text @click="loginHandler" v-if="!$store.state.user">
-        <span>登入</span>
-      </v-btn>
+      <template v-if="!$store.state.user">
+        <v-btn
+          text
+          @click="loginHandler"
+          v-for="(value, key) in oauthUrls"
+          :key="key"
+        >
+          <span class="font-weight-bold text-body-1">{{ key }} 登入</span>
+        </v-btn>
+      </template>
 
       <v-menu open-on-hover offset-y v-else>
         <template v-slot:activator="{ on, attrs }">
@@ -62,22 +68,29 @@
       <v-container>
         <router-view />
       </v-container>
-      
     </v-main>
   </div>
 </template>
 <script>
 export default {
+  data() {
+    return {
+      oauthUrls: null,
+    };
+  },
   mounted() {
     // console.log(process.env.VUE_APP_LINE_LOGIN_URI);
+    this.loadOauthUrls();
   },
   methods: {
+    async loadOauthUrls() {
+      const { data } = await this.$axios.get("/api/oauth-urls");
+      this.oauthUrls = data;
+    },
     loginHandler() {
-      console.log("login btn clicked");
       window.location.href = process.env.VUE_APP_LINE_LOGIN_URI;
     },
     logoutHandler() {
-      console.log("logout btn clicked");
       this.$axios
         .delete("/api/logout", {
           headers: { auth_token: window.localStorage.getItem("auth_token") },

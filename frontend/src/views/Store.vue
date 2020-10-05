@@ -1,38 +1,27 @@
 <template>
   <div class="store">
-    <v-row>
+    <v-row align-content="center" justify="center">
       <v-col cols="9"
         ><v-text-field
-          label="Regular"
+          label="店家名稱關鍵字搜尋"
           outlined
           solo
           rounded
           dense
+          v-model="searchTerm"
           prepend-inner-icon="mdi-magnify"
         ></v-text-field>
       </v-col>
-      <v-col cols="3">
-        <v-btn-toggle v-model="toggle_exclusive">
-          <v-btn>
-            <v-icon>mdi-format-align-left</v-icon>
-          </v-btn>
+      <v-col cols="2" v-if="$store.getters.isAuth">
+        <v-btn-toggle v-model="toggleExclusive">
+          <v-btn> 顯示全部店家 </v-btn>
 
-          <v-btn>
-            <v-icon>mdi-format-align-center</v-icon>
-          </v-btn>
-
-          <v-btn>
-            <v-icon>mdi-format-align-right</v-icon>
-          </v-btn>
-
-          <v-btn>
-            <v-icon>mdi-format-align-justify</v-icon>
-          </v-btn>
+          <v-btn> 屬於我的店家 </v-btn>
         </v-btn-toggle>
       </v-col>
     </v-row>
-    <div class="store-list" v-if="stores">
-      <template v-for="item in stores">
+    <div class="store-list" v-if="filterStoreByTerm">
+      <template v-for="item in filterStoreByTerm">
         <div class="card my-1" :key="item.id_store">
           <CardTile
             :store="item"
@@ -84,7 +73,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="snackbar" :color="snackbarColor">
+    <v-snackbar v-model="snackbar" :color="snackbarColor" right top>
       {{ snackbarText }}
 
       <template v-slot:action="{ attrs }">
@@ -110,7 +99,7 @@ export default {
       snackbar: false,
       snackbarColor: "error",
       snackbarText: "Something wrong",
-      toggle_exclusive: null,
+      toggleExclusive: 0,
       searchInput: "",
       editDialog: false,
       dialogMode: null,
@@ -118,18 +107,30 @@ export default {
       selectedStoreForm: storeInitForm,
       stores: null,
       deleteConfirmDialog: false,
+      searchTerm: "",
     };
   },
   components: { CardTile, EditStore },
   mounted() {
     this.loadStores();
   },
+  computed: {
+    filterStoreByTerm() {
+      if (!this.stores) return null;
+      return this.stores.filter((store) => {
+        return store.name.indexOf(this.searchTerm) > -1;
+      });
+    },
+  },
   methods: {
     async loadStores() {
       try {
-        const { data } = await this.$axios.get(
-          '/api/stores?filter={"include": [{"relation": "user"}],"order":["id_store DESC"]}'
-        );
+        let requestUrl =
+          '/api/stores?filter={"include": [{"relation": "user"}],"order":["id_store DESC"]}';
+        if (this.toggleExclusive === 1) {
+          requestUrl = `/api/stores?filter={"where": {"id_user": "${this.$store.state.user.id_user}"},"include": [{"relation": "user"}],"order":["id_store DESC"]}`;
+        }
+        const { data } = await this.$axios.get(requestUrl);
         this.stores = data;
       } catch (error) {
         console.log(error);
@@ -166,6 +167,7 @@ export default {
         this.snackbarColor = "success";
         this.snackbarText = "已成功刪除";
         this.deleteConfirmDialog = false;
+        this.loadStores();
       } catch (error) {
         this.snackbar = true;
         this.snackbarColor = "error";
@@ -182,6 +184,7 @@ export default {
           this.snackbarColor = "success";
           this.snackbarText = "已成功新增";
           this.closeDialogHandler();
+          this.loadStores();
         } catch (error) {
           this.snackbar = true;
           this.snackbarColor = "error";
@@ -202,6 +205,7 @@ export default {
           this.snackbarColor = "success";
           this.snackbarText = "已成功編輯";
           this.closeDialogHandler();
+          this.loadStores();
         } catch (error) {
           this.snackbar = true;
           this.snackbarColor = "error";
@@ -214,6 +218,11 @@ export default {
     closeDialogHandler() {
       this.editDialog = false;
       this.selectedStoreForm = storeInitForm;
+    },
+  },
+  watch: {
+    toggleExclusive() {
+      this.loadStores();
     },
   },
 };

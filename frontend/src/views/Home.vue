@@ -13,5 +13,8 @@ export default {
   components: {
     HelloWorld,
   },
+  mounted() {
+    this.$router.replace("/store");
+  },
 };
 </script>
