@@ -6,3 +6,4 @@ export * from './user.controller';
 export * from './user-store.controller';
 export * from './auth.controller';
 export * from './store-user.controller';
+export * from './tag.controller';
