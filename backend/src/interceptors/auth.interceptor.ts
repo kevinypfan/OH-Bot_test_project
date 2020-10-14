@@ -15,6 +15,8 @@ const PUBLIC_END_POINTS = [
   {path: '/stores', methods: 'GET'},
   {path: '/auth', methods: 'GET'},
   {path: '/oauth-urls', methods: 'GET'},
+  {path: '/users/{?}/tags', methods: 'POST'},
+  // {path: '/users', methods: 'GET,POST'},
   // {path: '/stores/{?}', methods: 'GET'},
 ];
 const USER_END_POINTS = [
@@ -77,6 +79,7 @@ export class AuthInterceptor implements Provider<Interceptor> {
                 if (path === checkPath[index]) return true;
                 return false;
               });
+              console.log(match);
               return match.every(el => el);
             }
           }

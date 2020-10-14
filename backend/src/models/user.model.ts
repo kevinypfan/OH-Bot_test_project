@@ -1,6 +1,8 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
-import {Token} from './token.model';
 import {Store} from './store.model';
+import {Tag} from './tag.model';
+import {Token} from './token.model';
+import {UserTagRelation} from './user-tag-relation.model';
 
 @model()
 export class User extends Entity {
@@ -31,6 +33,15 @@ export class User extends Entity {
 
   @hasMany(() => Store, {keyTo: 'id_user'})
   stores: Store[];
+
+  @hasMany(() => Tag, {
+    through: {
+      model: () => UserTagRelation,
+      keyFrom: 'id_user',
+      keyTo: 'id_tag',
+    },
+  })
+  tags: Tag[];
 
   constructor(data?: Partial<User>) {
     super(data);
